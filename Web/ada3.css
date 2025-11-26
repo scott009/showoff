@@ -1,0 +1,275 @@
+/* ada2.css — Accessibility-first stylesheet, modified from ada1.css
+   Changes:
+   - h2 (e.g. "Weeks") made larger and more noticeable.
+   - Week headings (h3 inside #weeks) made larger with more spacing above.
+*/
+
+:root {
+  --bg: #F5F1E8;
+  --fg: #3E2723;
+  --muted: #5D4037;
+  --link: #0645ad;
+  --link-visited: #5a3696;
+  --focus: #ffbf47;
+  --border: #D7CCC8;
+  --card: #F5F1E8;
+  --accent-bg: #EFEBE9;
+  --accent-border: #5D4037;
+  --success-bg: #E8F5E9;
+  --success-border: #2E7D32;
+}
+
+* { box-sizing: border-box; }
+
+html { font-size: 100%; }
+body {
+  margin: 0;
+  color: var(--fg);
+  background: var(--bg);
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans", "Liberation Sans", sans-serif;
+  line-height: 1.7;
+}
+
+/* Headings */
+h1, h2, h3 {
+  font-weight: 700;
+  line-height: 1.3;
+  margin: 1.25em 0 .6em;
+}
+
+/* "Weeks" heading (level 2) */
+h2 {
+  font-size: 2rem;        /* ~32px */
+  margin-top: 2rem;       /* more separation above */
+  margin-bottom: 1rem;
+  text-align: center;     /* centered to stand out */
+}
+
+/* Main chapter heading (integer chapter number) */
+h2.chaptermain {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--fg);
+  margin-top: 7rem;  /* doubled spacing above chapter */
+}
+
+/* Sub-chapter heading (decimal chapter number) - less prominent */
+h3.chaptersub {
+  font-size: 1.4rem;      /* smaller than main chapters */
+  font-weight: 500;       /* lighter weight */
+  color: var(--muted);    /* muted color */
+  text-align: left;       /* left-aligned */
+  margin-top: 2rem;       /* consistent spacing */
+  margin-bottom: 1rem;
+}
+
+/* Default h3 */
+h3 { font-size: 1.25rem; }
+
+/* ID tag styling - positioned absolutely in left margin area */
+h3.id-tag {
+  position: absolute;
+  left: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 400;
+  margin: 0;
+  padding: 0;
+  color: var(--muted);
+  line-height: 1.7;
+  width: 3rem;
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Easily hide IDs without affecting layout */
+/* h3.id-tag { display: none; } */
+
+/* Hide ID tag when it comes before a subtitle */
+h3.id-tag:has(+ p.subtitle) {
+  display: none;
+}
+
+/* Week headings inside Weeks section */
+#weeks h3 {
+  font-size: 1.75rem;     /* ~28px, bigger than normal h3 */
+  margin-top: 2.2rem;     /* extra vertical space above */
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+/* Rest of styles remain same as ada1.css … */
+p {
+  margin: 0 0 1rem 0;
+  padding-left: 0;  /* content flows naturally, unaffected by ID positioning */
+  padding-right: 0;
+  font-size: 1.1rem;
+  font-family: Georgia, "Garamond", "Times New Roman", serif;
+  overflow: auto;
+}
+a { color: var(--link); text-decoration: underline; }
+a:visited { color: var(--link-visited); }
+a:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+/* Custom paragraph classes for Recovery Dharma content */
+
+/* Subtitle styling - prominent section subtitles */
+.subtitle {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-top: -0.9rem;  /* bring even closer to heading */
+  margin-bottom: 1rem;
+  color: var(--fg);
+  text-align: center;
+  font-style: italic;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Centered text */
+.centered {
+  text-align: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/* Inquiry chapter heading - h3 headings for inquiry chapters */
+.inquiry-chapter {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--muted);
+}
+
+/* Inquiry heading - section headers within inquiry chapters */
+.inquiryheading {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: var(--accent-border);
+}
+
+/* Bullet point list items */
+.bullitt {
+  margin-left: 1.5rem;
+  margin-bottom: 0.5rem;
+  position: relative;
+  padding-left: 0.5rem;
+}
+
+.bullitt::before {
+  content: "•";
+  position: absolute;
+  left: -1rem;
+  color: var(--muted);
+}
+
+/* Inquiry bullet points - styled differently for inquiry sections */
+.inquirybullitt {
+  margin-left: 0;
+  margin-bottom: 0.75rem;
+  padding-left: 2rem;
+  color: var(--fg);
+  position: relative;
+}
+
+.inquirybullitt::before {
+  content: "•";
+  position: absolute;
+  left: 0.5rem;
+  top: 0;
+  color: var(--accent-border);
+  font-size: 1.2rem;
+}
+
+/* Numbered list items */
+.numlist {
+  margin-left: 2rem;
+  margin-bottom: 0.5rem;
+  counter-increment: numlist-counter;
+  position: relative;
+}
+
+/* Inquiry numbered list items */
+.inquirynumlist {
+  margin-left: 2rem;
+  margin-bottom: 0.75rem;
+  counter-increment: inquirynumlist-counter;
+  position: relative;
+  font-style: italic;
+  color: var(--fg);
+}
+
+/* Verse/blessing lines - poetic formatting */
+.verse {
+  padding-left: 12rem;  /* deep indent, aligning with third word */
+  line-height: 0.9;   /* half the normal line-height for compact verse */
+  margin-bottom: 0.3rem;  /* tight spacing between lines */
+}
+
+/* Indented numbered list - numbers indented from content */
+ol.numlist {
+  padding-left: 4rem;  /* indent from left edge of content */
+  margin-left: 0;
+  margin-bottom: 1rem;
+  margin-top: 0;
+  list-style-position: outside;
+}
+
+ol.numlist li {
+  margin-left: 0;
+  margin-bottom: 0.5rem;
+}
+
+/* Table of Contents styling */
+#table-of-contents {
+  margin-top: 3rem;
+  margin-bottom: 3rem;
+  padding: 2rem;
+  background-color: var(--accent-bg);
+  border-left: 4px solid var(--accent-border);
+  columns: 2;
+  column-gap: 2rem;
+  column-fill: auto;
+}
+
+#table-of-contents h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+}
+
+.TOCentry {
+  display: block;
+  margin-bottom: 0.75rem;
+  padding-left: 1rem;
+  text-decoration: none;
+  color: var(--link);
+}
+
+.TOCentry:visited {
+  color: var(--link-visited);
+}
+
+.TOCentry:hover {
+  text-decoration: underline;
+}
+
+/* Vertical spacing utility */
+.vspace1 {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Responsive main content padding - with margin area for ID tags */
+main {
+  position: relative;
+  padding-left: clamp(2rem, 8vw, 4rem);  /* left margin area for ID tags */
+  padding-right: clamp(1rem, 5vw, 3rem);
+  max-width: 90rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* … keep all other definitions from ada1.css unchanged */
