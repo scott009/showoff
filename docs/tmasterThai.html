@@ -18,24 +18,92 @@
             color: white;
             padding: 20px;
             border-radius: 8px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         header h1 {
             margin: 0 0 15px 0;
         }
 
+        .reviewer-section {
+            background: #c53030;
+            background: linear-gradient(135deg, #c53030 0%, #9b2c2c 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .reviewer-section h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.3em;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .reviewer-section p {
+            margin: 0 0 20px 0;
+            opacity: 0.95;
+        }
+
         .editor-info {
             display: flex;
             gap: 15px;
-            margin-top: 15px;
+            margin-bottom: 20px;
         }
 
         .editor-info input {
             flex: 1;
-            padding: 8px;
+            padding: 10px;
             border-radius: 4px;
-            border: 1px solid #ddd;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.95);
+            font-size: 15px;
+        }
+
+        .editor-info input:required {
+            border-left: 4px solid #fff;
+        }
+
+        .editor-info input:focus {
+            outline: none;
+            border-color: #fff;
+            background: #fff;
+        }
+
+        .reviewer-section label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .reviewer-section textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 4px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.95);
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        .reviewer-section textarea:focus {
+            outline: none;
+            border-color: #fff;
+            background: #fff;
+        }
+
+        .field-note {
+            font-size: 13px;
+            opacity: 0.9;
+            font-style: italic;
+            margin-top: -10px;
+            margin-bottom: 15px;
         }
 
         .paragraph-block {
@@ -218,11 +286,25 @@
     <header>
         <h1>Recovery Dharma - Thai Translation Correction Tool</h1>
         <p>Review and correct Thai translations. Chapters 3-36. Your edits will be saved to a JSON file.</p>
-        <div class="editor-info">
-            <input type="text" id="editor-name" placeholder="Your Name (optional)">
-            <input type="email" id="editor-email" placeholder="Your Email (optional)">
-        </div>
     </header>
+
+    <div class="reviewer-section">
+        <h2>👤 Reviewer Information (Required)</h2>
+        <p>Please provide your information before starting the review. This helps us track contributions and contact you if needed.</p>
+
+        <div class="editor-info">
+            <input type="text" id="editor-name" placeholder="Your Full Name *" required>
+            <input type="email" id="editor-email" placeholder="Your Email Address *" required>
+        </div>
+
+        <label for="about-yourself">Tell us about yourself (optional):</label>
+        <p class="field-note">Your background, qualifications, or relevant experience (e.g., "Native Thai speaker", "Buddhist scholar", "Professional translator")</p>
+        <textarea id="about-yourself" rows="3" placeholder="Example: Native Thai speaker with 10 years translation experience. Studied Buddhist texts at university..."></textarea>
+
+        <label for="overall-notes">Overall review notes (optional):</label>
+        <p class="field-note">General observations about the entire translation</p>
+        <textarea id="overall-notes" rows="4" placeholder="Example: Overall quality is good. Found some inconsistent terminology in Chapter 24. Recommend second review for Buddhist technical terms..."></textarea>
+    </div>
 
     <main>
         <form id="correction-form">
@@ -10603,8 +10685,32 @@
 
         // Download button handler
         document.getElementById('download-btn').addEventListener('click', function() {
-            const editorName = document.getElementById('editor-name').value || 'Anonymous';
-            const editorEmail = document.getElementById('editor-email').value || '';
+            // Validate required fields
+            const editorName = document.getElementById('editor-name').value.trim();
+            const editorEmail = document.getElementById('editor-email').value.trim();
+
+            if (!editorName || !editorEmail) {
+                alert('⚠️ Please fill in your name and email address before downloading corrections.');
+                // Focus on first empty field
+                if (!editorName) {
+                    document.getElementById('editor-name').focus();
+                } else {
+                    document.getElementById('editor-email').focus();
+                }
+                return;
+            }
+
+            // Validate email format
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(editorEmail)) {
+                alert('⚠️ Please enter a valid email address.');
+                document.getElementById('editor-email').focus();
+                return;
+            }
+
+            // Get optional fields
+            const aboutYourself = document.getElementById('about-yourself').value.trim();
+            const overallNotes = document.getElementById('overall-notes').value.trim();
 
             const corrections = [];
 
@@ -10647,6 +10753,14 @@
                 corrections: corrections
             };
 
+            // Add optional fields if provided
+            if (aboutYourself) {
+                output.metadata.about_reviewer = aboutYourself;
+            }
+            if (overallNotes) {
+                output.metadata.overall_notes = overallNotes;
+            }
+
             // Create download
             const jsonStr = JSON.stringify(output, null, 2);
             const blob = new Blob([jsonStr], { type: 'application/json' });
@@ -10661,7 +10775,7 @@
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            alert(`Downloaded corrections for ${corrections.length} items across ${output.metadata.chapters_covered.length} chapters!`);
+            alert(`✓ Downloaded corrections for ${corrections.length} items across ${output.metadata.chapters_covered.length} chapters!`);
         });
 
         // Warn before leaving if there are unsaved edits
