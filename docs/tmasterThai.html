@@ -10609,7 +10609,7 @@
     </main>
 
     <footer>
-        <button type="button" id="download-btn">📥 Download Corrections JSON</button>
+        <button type="button" id="download-btn">Submit</button>
         <div id="stats">
             <span id="total-count">396 items (45 chapters + 351 paragraphs)</span>
             <span id="edited-count">0 edited</span>
@@ -10640,59 +10640,85 @@
         });
 
         // Download button handler
-        document.getElementById('download-btn').addEventListener('click', function() {
-            // Validate required fields
-            const editorName = document.getElementById('editor-name').value.trim();
-            const editorEmail = document.getElementById('editor-email').value.trim();
+        document.getElementById('download-btn').addEventListener('click', async function() {
+        // Validate required fields
+        const editorName = document.getElementById('editor-name').value.trim();
+        const editorEmail = document.getElementById('editor-email').value.trim();
 
-            if (!editorName || !editorEmail) {
-                alert('⚠️ Please fill in your name and email address before downloading corrections.');
-                // Focus on first empty field
-                if (!editorName) {
-                    document.getElementById('editor-name').focus();
-                } else {
-                    document.getElementById('editor-email').focus();
-                }
-                return;
-            }
-
-            // Validate email format
-            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailPattern.test(editorEmail)) {
-                alert('⚠️ Please enter a valid email address.');
+        if (!editorName || !editorEmail) {
+            alert('⚠️ Please fill in your name and email address before submitting.');
+            if (!editorName) {
+                document.getElementById('editor-name').focus();
+            } else {
                 document.getElementById('editor-email').focus();
-                return;
+            }
+            return;
+        }
+
+        // Validate email format
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailPattern.test(editorEmail)) {
+            alert('⚠️ Please enter a valid email address.');
+            document.getElementById('editor-email').focus();
+            return;
+        }
+
+        // Get optional fields
+        const aboutYourself = document.getElementById('about-yourself').value.trim();
+        const overallNotes = document.getElementById('overall-notes').value.trim();
+
+        const corrections = [];
+
+        // Collect all modified items
+        document.querySelectorAll('.paragraph-block.modified').forEach(block => {
+            const itemId = block.dataset.id;
+            const chapterNum = block.dataset.chapter;
+            const textarea = block.querySelector('textarea');
+            const commentInput = block.querySelector('input[name$="-comment"]');
+
+            const correction = {
+                id: itemId,
+                chapter: parseInt(chapterNum),
+                original: textarea.dataset.original,
+                edited: textarea.value,
+                status_update: 'corrected'
+            };
+
+            // Add comment if provided
+            const comment = commentInput.value.trim();
+            if (comment) {
+                correction.comment = comment;
             }
 
-            // Get optional fields
-            const aboutYourself = document.getElementById('about-yourself').value.trim();
-            const overallNotes = document.getElementById('overall-notes').value.trim();
+            corrections.push(correction);
+        });
 
-            const corrections = [];
+        // Build JSON output
+        const output = {
+            metadata: {
+                language: 'thai',
+                editor: editorName,
+                editor_email: editorEmail,
+                timestamp: new Date().toISOString(),
+                source_file: 'RDGBook_Thai.md',
+                total_items: document.querySelectorAll('.paragraph-block').length,
+                edited_items: corrections.length,
+                chapters_covered: [...new Set(corrections.map(c => c.chapter))].sort((a,b) => a-b)
+            },
+            corrections: corrections
+        };
 
-            // Collect all modified items
-            document.querySelectorAll('.paragraph-block.modified').forEach(block => {
-                const itemId = block.dataset.id;
-                const chapterNum = block.dataset.chapter;
-                const textarea = block.querySelector('textarea');
-                const commentInput = block.querySelector('input[name$="-comment"]');
+        // Add optional fields if provided
+        if (aboutYourself) {
+            output.metadata.about_reviewer = aboutYourself;
+        }
+        if (overallNotes) {
+            output.metadata.overall_notes = overallNotes;
+        }
 
-                const correction = {
-                    id: itemId,
-                    chapter: parseInt(chapterNum),
-                    original: textarea.dataset.original,
-                    edited: textarea.value,
-                    status_update: 'corrected'
-                };
-
-                // Add comment if provided
-                const comment = commentInput.value.trim();
-                if (comment) {
-                    correction.comment = comment;
-                }
-
-                corrections.push(correction);
-            });
+        // Use new submission handler (submits to GitHub + downloads backup)
+        await handleFormSubmission(output);
+    });
 
             // Build JSON output
             const output = {
@@ -10743,5 +10769,7 @@
             }
         });
     </script>
+
+    <script src="submit-handler.js"></script>
 </body>
 </html>
