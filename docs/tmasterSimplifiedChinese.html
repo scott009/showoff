@@ -10682,38 +10682,6 @@
         await handleFormSubmission(output);
     });
 
-            // Build JSON output
-            const output = {
-                metadata: {
-                    language: 'simplified_chinese',
-                    editor: editorName,
-                    editor_email: editorEmail,
-                    timestamp: new Date().toISOString(),
-                    source_file: 'RDGBook_SimplifiedChinese.md',
-                    total_items: 396,
-                    edited_items: corrections.length,
-                    chapters_covered: [...new Set(corrections.map(c => c.chapter))].sort((a,b) => a-b)
-                },
-                corrections: corrections
-            };
-
-            // Create download
-            const jsonStr = JSON.stringify(output, null, 2);
-            const blob = new Blob([jsonStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-
-            const a = document.createElement('a');
-            a.href = url;
-            const timestamp = new Date().toISOString().split('T')[0];
-            a.download = `thai_corrections_${timestamp}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            alert(`Downloaded corrections for ${corrections.length} items across ${output.metadata.chapters_covered.length} chapters!`);
-        });
-
         // Warn before leaving if there are unsaved edits
         window.addEventListener('beforeunload', function(e) {
             if (editedCount > 0) {
